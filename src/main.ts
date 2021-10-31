@@ -1,18 +1,63 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as exec from '@actions/exec'
+import * as stream from 'stream'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const debugBuild: boolean = core.getBooleanInput('debug')
+    const configuration = debugBuild ? 'Debug' : 'Release'
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const buildArgs = [
+      '-configuration',
+      configuration,
+      '-ci',
+      '--pack',
+      '--all',
+      '--no-build-java',
+      '-p:OnlyPackPlatformSpecificPackages=true',
+      '-bl:artifacts/log/build.macos.binlog',
+      '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml]'
+    ]
 
-    core.setOutput('time', new Date().toTimeString())
+    const outStream = new StringStream()
+    let output = ''
+    const options = {
+      outStream,
+      windowsVerbatimArguments: true,
+      listeners: {
+        stdout: (data: Buffer) => {
+          output += data.toString()
+        }
+      }
+    }
+
+    await exec.exec('./build.sh', buildArgs, options)
+
+    core.setOutput('stdout', output)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
+  }
+}
+
+export class StringStream extends stream.Writable {
+  constructor() {
+    super()
+    stream.Writable.call(this)
+  }
+
+  private contents = ''
+
+  _write(
+    data: string | Buffer | Uint8Array,
+    encoding: string,
+    next: Function
+  ): void {
+    this.contents += data
+    next()
+  }
+
+  getContents(): string {
+    return this.contents
   }
 }
 
