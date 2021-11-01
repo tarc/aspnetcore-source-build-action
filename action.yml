@@ -2,6 +2,10 @@ name: 'Build ASP.NET Core'
 description: 'Build ASP.NET Core Source Code'
 author: 'Tarcísio Genaro Rodrigues'
 inputs:
+  only_pack_platform_specific_packages:
+    description: 'Whether to pack all nuget packages or only those platform specific'
+    required: false
+    default: false
   debug:
     description: 'Whether a debug build is requested'
     required: false

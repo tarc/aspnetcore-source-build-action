@@ -15,22 +15,28 @@ test('test release build', async () => {
   expect(stdout).not.toMatch(/-configuration +Debug/)
 })
 
+test('test packages only platform specific', async () => {
+  const { stdout } = await getExecOutput({ onlyPlatformSpecificPackages: true })
+  expect(stdout).toMatch(/-p:OnlyPackPlatformSpecificPackages=true/)
+})
+
 interface NamedParameters {
-  debug?: boolean
+  debug?: boolean,
+  onlyPlatformSpecificPackages?: boolean
 }
 
-async function getExecOutput({ debug }: NamedParameters): Promise<exec.ExecOutput> {
+async function getExecOutput(parameters: NamedParameters): Promise<exec.ExecOutput> {
   const nodePath: string = await io.which('node', true)
   const mainPath = path.join(__dirname, '..', 'lib', 'main.js')
   return exec.getExecOutput(
     nodePath,
     [mainPath],
-    getExecOptions(debug))
+    getExecOptions(parameters))
 }
 
-function getExecOptions(debug?: boolean): exec.ExecOptions {
+function getExecOptions(parameters: NamedParameters): exec.ExecOptions {
   return {
-    ...getEnv(debug),
+    ...getEnv(parameters),
     cwd: path.join(__dirname, '..'),
     silent: false,
     failOnStdErr: false,
@@ -38,11 +44,19 @@ function getExecOptions(debug?: boolean): exec.ExecOptions {
   }
 }
 
-function getEnv(debug?: boolean) {
-  if (debug == undefined) {
-    return {}
-  }
+function getEnv({ debug, onlyPlatformSpecificPackages: platformSpecific }: NamedParameters) {
   return {
-    env: { 'INPUT_DEBUG': debug.toString() }
+    env: {
+      ...getDebugEnv(debug),
+      ...getPlatformSpecificEnv(platformSpecific)
+    }
   }
+}
+
+function getDebugEnv(debug?: boolean) {
+  return { 'INPUT_DEBUG': debug?.toString() || 'true' }
+}
+
+function getPlatformSpecificEnv(platformSpecific?: boolean) {
+  return { 'INPUT_ONLY_PACK_PLATFORM_SPECIFIC_PACKAGES': platformSpecific?.toString() || 'true' }
 }

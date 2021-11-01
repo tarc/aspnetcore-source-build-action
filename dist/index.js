@@ -44,6 +44,7 @@ function run() {
         try {
             const debugBuild = core.getBooleanInput('debug');
             const configuration = debugBuild ? 'Debug' : 'Release';
+            const platformSpecific = core.getBooleanInput('only_pack_platform_specific_packages');
             const buildArgs = [
                 '-configuration',
                 configuration,
@@ -51,7 +52,7 @@ function run() {
                 '--pack',
                 '--all',
                 '--no-build-java',
-                '-p:OnlyPackPlatformSpecificPackages=true',
+                `-p:OnlyPackPlatformSpecificPackages=${platformSpecific}`,
                 '-bl:artifacts/log/build.macos.binlog',
                 '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml'
             ];

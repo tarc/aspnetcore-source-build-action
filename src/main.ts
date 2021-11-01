@@ -7,6 +7,10 @@ async function run(): Promise<void> {
     const debugBuild: boolean = core.getBooleanInput('debug')
     const configuration = debugBuild ? 'Debug' : 'Release'
 
+    const platformSpecific: boolean = core.getBooleanInput(
+      'only_pack_platform_specific_packages'
+    )
+
     const buildArgs = [
       '-configuration',
       configuration,
@@ -14,7 +18,7 @@ async function run(): Promise<void> {
       '--pack',
       '--all',
       '--no-build-java',
-      '-p:OnlyPackPlatformSpecificPackages=true',
+      `-p:OnlyPackPlatformSpecificPackages=${platformSpecific}`,
       '-bl:artifacts/log/build.macos.binlog',
       '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml'
     ]
