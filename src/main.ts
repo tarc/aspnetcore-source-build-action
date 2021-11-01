@@ -16,7 +16,7 @@ async function run(): Promise<void> {
       '--no-build-java',
       '-p:OnlyPackPlatformSpecificPackages=true',
       '-bl:artifacts/log/build.macos.binlog',
-      '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml]'
+      '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml'
     ]
 
     let output = ''
