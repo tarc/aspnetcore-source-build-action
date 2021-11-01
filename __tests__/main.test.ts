@@ -15,9 +15,15 @@ test('test release build', async () => {
   expect(stdout).not.toMatch(/configuration +Debug/)
 })
 
+test('test not to pack only platform specific', async () => {
+  const { stdout } = await getExecOutput({ onlyPlatformSpecificPackages: false })
+  expect(stdout).not.toMatch(/p:OnlyPackPlatformSpecificPackages=true/)
+})
+
 test('test only platform specific packages', async () => {
   const { stdout } = await getExecOutput({ onlyPlatformSpecificPackages: true })
   expect(stdout).toMatch(/p:OnlyPackPlatformSpecificPackages=true/)
+  expect(stdout).not.toMatch(/p:OnlyPackPlatformSpecificPackages=false/)
 })
 
 test('test nodejs build for debug builds', async () => {
@@ -28,11 +34,24 @@ test('test nodejs build for debug builds', async () => {
 test('test nodejs build for release builds', async () => {
   const { stdout } = await getExecOutput({ debug: false })
   expect(stdout).toMatch(/--no-build-nodejs/)
+  expect(stdout).not.toMatch(/--build-nodejs/)
+})
+
+test('test building of test targets', async () => {
+  const { stdout } = await getExecOutput({ test: true })
+  expect(stdout).not.toMatch(/--test/)
+})
+
+test('test non build of test targets', async () => {
+  const { stdout } = await getExecOutput({ test: false })
+  expect(stdout).toMatch(/--no-test/)
+  expect(stdout).not.toMatch(/--test/)
 })
 
 interface NamedParameters {
   debug?: boolean,
   onlyPlatformSpecificPackages?: boolean
+  test?: boolean
 }
 
 async function getExecOutput(parameters: NamedParameters): Promise<exec.ExecOutput> {
@@ -54,11 +73,12 @@ function getExecOptions(parameters: NamedParameters): exec.ExecOptions {
   }
 }
 
-function getEnv({ debug, onlyPlatformSpecificPackages: platformSpecific }: NamedParameters) {
+function getEnv({ debug, onlyPlatformSpecificPackages, test }: NamedParameters) {
   return {
     env: {
       ...getDebugEnv(debug),
-      ...getPlatformSpecificEnv(platformSpecific)
+      ...getPlatformSpecificEnv(onlyPlatformSpecificPackages),
+      ...getTestEnv(test)
     }
   }
 }
@@ -69,4 +89,8 @@ function getDebugEnv(debug?: boolean) {
 
 function getPlatformSpecificEnv(platformSpecific?: boolean) {
   return { 'INPUT_ONLY_PACK_PLATFORM_SPECIFIC_PACKAGES': platformSpecific?.toString() || 'true' }
+}
+
+function getTestEnv(test?: boolean) {
+  return { 'INPUT_TEST': test?.toString() || 'true' }
 }

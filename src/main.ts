@@ -7,20 +7,29 @@ async function run(): Promise<void> {
     const debugBuild: boolean = core.getBooleanInput('debug')
     const configuration = debugBuild ? 'Debug' : 'Release'
 
-    const platformSpecific: boolean = core.getBooleanInput(
-      'only_pack_platform_specific_packages'
-    )
-
     let buildNodeJs: string[] = []
 
     if (!debugBuild) {
       buildNodeJs = ['--no-build-nodejs']
     }
 
+    const platformSpecific: boolean = core.getBooleanInput(
+      'only_pack_platform_specific_packages'
+    )
+
+    const test: boolean = core.getBooleanInput('test')
+
+    let testOption: string[] = []
+
+    if (!test) {
+      testOption = ['--no-test']
+    }
+
     const buildArgs = [
       '-configuration',
       configuration,
       ...buildNodeJs,
+      ...testOption,
       '-ci',
       '--pack',
       '--all',
