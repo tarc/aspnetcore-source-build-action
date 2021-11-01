@@ -45,9 +45,14 @@ function run() {
             const debugBuild = core.getBooleanInput('debug');
             const configuration = debugBuild ? 'Debug' : 'Release';
             const platformSpecific = core.getBooleanInput('only_pack_platform_specific_packages');
+            let buildNodeJs = [];
+            if (!debugBuild) {
+                buildNodeJs = ['--no-build-nodejs'];
+            }
             const buildArgs = [
                 '-configuration',
                 configuration,
+                ...buildNodeJs,
                 '-ci',
                 '--pack',
                 '--all',

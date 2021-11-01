@@ -11,9 +11,16 @@ async function run(): Promise<void> {
       'only_pack_platform_specific_packages'
     )
 
+    let buildNodeJs: string[] = []
+
+    if (!debugBuild) {
+      buildNodeJs = ['--no-build-nodejs']
+    }
+
     const buildArgs = [
       '-configuration',
       configuration,
+      ...buildNodeJs,
       '-ci',
       '--pack',
       '--all',
