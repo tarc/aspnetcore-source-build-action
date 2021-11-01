@@ -19,10 +19,8 @@ async function run(): Promise<void> {
       '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml]'
     ]
 
-    const outStream = new StringStream()
     let output = ''
     const options = {
-      outStream,
       windowsVerbatimArguments: true,
       listeners: {
         stdout: (data: Buffer) => {

@@ -55,10 +55,8 @@ function run() {
                 '-bl:artifacts/log/build.macos.binlog',
                 '-p:AssetManifestFileName=aspnetcore-MacOS_x64.xml]'
             ];
-            const outStream = new StringStream();
             let output = '';
             const options = {
-                outStream,
                 windowsVerbatimArguments: true,
                 listeners: {
                     stdout: (data) => {
