@@ -2,6 +2,13 @@ name: 'Build ASP.NET Core'
 description: 'Build ASP.NET Core Source Code'
 author: 'Tarcísio Genaro Rodrigues'
 inputs:
+  artifact_name:
+    description: 'Name of the artifact to be uploaded with the generated packages'
+    required: false
+  follow_symbolic_links:
+    description: 'Indicates whether to follow symbolic links when collecting artifacts'
+    required: false
+    default: true
   debug:
     description: 'Whether a debug build is requested'
     required: false

@@ -1,5 +1,7 @@
+import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
+import * as glob from '@actions/glob'
 import * as stream from 'stream'
 
 async function run(): Promise<void> {
@@ -50,8 +52,26 @@ async function run(): Promise<void> {
     }
 
     await exec.exec('./build.sh', buildArgs, options)
-
     core.setOutput('stdout', output)
+
+    const artifactClient = artifact.create()
+    const artifactName = core.getInput('artifact_name')
+
+    console.log('artifact name: %s', artifactName)
+
+    if (!artifactName) {
+      return
+    }
+
+    const patterns = [`artifacts/packages/${configuration}/Shipping/**`]
+    const globber = await glob.create(patterns.join('\n'))
+    const files = await globber.glob()
+    console.log('files: %s', files.join(','))
+
+    const uploadOptions = {
+      continueOnError: true
+    }
+    await artifactClient.uploadArtifact(artifactName, files, '.', uploadOptions)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

@@ -49,6 +49,7 @@ test('test non build of test targets', async () => {
 })
 
 interface NamedParameters {
+  artifactName?: string,
   debug?: boolean,
   onlyPlatformSpecificPackages?: boolean
   test?: boolean
@@ -73,14 +74,19 @@ function getExecOptions(parameters: NamedParameters): exec.ExecOptions {
   }
 }
 
-function getEnv({ debug, onlyPlatformSpecificPackages, test }: NamedParameters) {
+function getEnv({ artifactName, debug, onlyPlatformSpecificPackages, test }: NamedParameters) {
   return {
     env: {
+      ...getArtifactNameEnv(artifactName),
       ...getDebugEnv(debug),
       ...getPlatformSpecificEnv(onlyPlatformSpecificPackages),
       ...getTestEnv(test)
     }
   }
+}
+
+function getArtifactNameEnv(artifactName?: string) {
+  return { 'INPUT_ARTIFACT_NAME': artifactName || ''}
 }
 
 function getDebugEnv(debug?: boolean) {
