@@ -82,14 +82,12 @@ function run() {
             core.setOutput('stdout', output);
             const artifactClient = artifact.create();
             const artifactName = core.getInput('artifact_name');
-            console.log('artifact name: %s', artifactName);
             if (!artifactName) {
                 return;
             }
             const patterns = [`artifacts/packages/${configuration}/Shipping/**`];
             const globber = yield glob.create(patterns.join('\n'));
             const files = yield globber.glob();
-            console.log('files: %s', files.join(','));
             const uploadOptions = {
                 continueOnError: true
             };

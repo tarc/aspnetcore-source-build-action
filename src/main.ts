@@ -57,8 +57,6 @@ async function run(): Promise<void> {
     const artifactClient = artifact.create()
     const artifactName = core.getInput('artifact_name')
 
-    console.log('artifact name: %s', artifactName)
-
     if (!artifactName) {
       return
     }
@@ -66,7 +64,6 @@ async function run(): Promise<void> {
     const patterns = [`artifacts/packages/${configuration}/Shipping/**`]
     const globber = await glob.create(patterns.join('\n'))
     const files = await globber.glob()
-    console.log('files: %s', files.join(','))
 
     const uploadOptions = {
       continueOnError: true
